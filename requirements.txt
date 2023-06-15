@@ -1,0 +1,4 @@
+black
+discord
+discord.py
+python-dotenv
