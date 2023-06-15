@@ -10,6 +10,7 @@ SPINNING_WHEEL_CHANNEL = os.getenv("CHANNEL_ID")
 SPINNING_WHEEL_USER = os.getenv("USER_ID")
 
 intents = discord.Intents.default()
+intents.message_content = True
 
 bot = commands.Bot(command_prefix="!", intents=intents)
 
@@ -34,8 +35,12 @@ async def get_challenges():
 
         stripped_text = text.replace("\n", "")
 
-        reaction = discord.utils.get(message.reactions, emoji="⬆️")
-        reaction_count = reaction.count
+        if discord.utils.get(message.reactions, emoji="⬆️"):
+            reaction = discord.utils.get(message.reactions, emoji="⬆️")
+            reaction_count = reaction.count
+        else:
+            reaction_count = 0
+
         user_id = message.author.id
         username = message.author.name
         message_url = message.jump_url
@@ -65,6 +70,11 @@ async def sort_challenges():
     name="generate", description="Get the top 10 challenges and 5 extra substitutes."
 )
 async def send_challenges(interaction: discord.Interaction):
+    
+    if interaction.user.id != SPINNING_WHEEL_USER:
+        await interaction.response.send_message("You are not allowed to use this command.", ephemeral=True)
+        return
+    
     count = 1
     challenges = await sort_challenges()
 
