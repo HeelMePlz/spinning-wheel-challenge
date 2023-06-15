@@ -19,6 +19,7 @@ async def on_ready():
     print(f"{bot.user} has connected to Discord!")
     await bot.tree.sync()
 
+
 async def get_challenges():
     challenges = []
 
@@ -50,6 +51,14 @@ async def get_challenges():
         )
 
     return challenges
+
+
+async def sort_challenges():
+    challenges = await get_challenges()
+
+    sorted_challenges = sorted(challenges, key=lambda d: d["reactions"], reverse=True)
+
+    return sorted_challenges
 
 
 bot.run(TOKEN)
