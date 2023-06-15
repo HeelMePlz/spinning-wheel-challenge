@@ -61,4 +61,43 @@ async def sort_challenges():
     return sorted_challenges
 
 
+@bot.tree.command(
+    name="generate", description="Get the top 10 challenges and 5 extra substitutes."
+)
+async def send_challenges(interaction: discord.Interaction):
+    count = 1
+    challenges = await sort_challenges()
+
+    channel_id = str(SPINNING_WHEEL_CHANNEL)
+    channel = bot.get_channel(int(channel_id))
+
+    output = "# Top 10 Challenges:\n"
+
+    for challenge in challenges[:5]:
+        challenge_output = f"**{count})** {challenge.get('challenge')} - **{challenge.get('reactions')}** ⬆️ - by <@{challenge.get('user')}> -> {challenge.get('link')}\n"
+        output += challenge_output
+        count += 1
+
+    # split the top 10 into 2 messages because of 2000 character limit
+    output2 = ""
+
+    for challenge in challenges[6:11]:
+        challenge_output = f"**{count})** {challenge.get('challenge')} - **{challenge.get('reactions')}** ⬆️ - by <@{challenge.get('user')}> -> {challenge.get('link')}\n"
+        output2 += challenge_output
+        count += 1
+
+    subs_output = "# Next 5 Substitute Challenges:\n"
+
+    for challenge in challenges[11:16]:
+        challenge_subs = f"**{count})** {challenge.get('challenge')} - **{challenge.get('reactions')}** ⬆️ - by {challenge.get('username')} -> {challenge.get('link')}\n"
+        subs_output += challenge_subs
+        count += 1
+
+    await interaction.response.send_message(output)
+    await channel.send(output2)
+    await channel.send(subs_output)
+
+    return
+
+
 bot.run(TOKEN)
